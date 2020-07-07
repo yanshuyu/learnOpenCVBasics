@@ -103,3 +103,52 @@ cv::Mat equalizeMat(const cv::Mat& iMat) {
 }
 
 
+
+
+void cartoonFilter(cv::Mat& iMat, cv::Mat& oMat, double edgeThreshold1, double degeThreshold2, int edgeWidth) {
+	// apply median filter to remove possible noise
+	cv::Mat cannyMatReady;
+	cv::medianBlur(iMat, cannyMatReady, 5);
+	//cv::imshow("noise reduction", resultMat);
+
+	// apply canny filter to look up edges
+	cv::Mat cannyMat;
+	cv::Canny(cannyMatReady, cannyMat, edgeThreshold1, degeThreshold2 );
+
+	// apply dilate filter to expand and link edge
+	cv::Mat k = cv::getStructuringElement(cv::MORPH_RECT, cv::Point(edgeWidth, edgeWidth));
+	cv::dilate(cannyMat, cannyMat, k);
+
+	// scale edge to [0,1], invert edge color
+	cannyMat = 255 - cannyMat;
+	cannyMat = cannyMat / 255;
+
+	// convert to float component for blending
+	cv::Mat cannyMatFlt;
+	cannyMat.convertTo(cannyMatFlt, CV_32F);
+
+	cv::Mat cannyMatFlt3C;
+	cv::Mat cannyMatChannels[] = { cannyMatFlt, cannyMatFlt, cannyMatFlt };
+	cv::merge(cannyMatChannels, 3, cannyMatFlt3C);
+
+	// smooth edge
+	cv::blur(cannyMatFlt3C, cannyMatFlt3C, cv::Size(5, 5));
+
+	//cv::imshow("edges", cannyMatFlt3C);
+
+	// apply  bilateral filter reduce noise and keep edge
+	// truncate color to create stonger cartoon efflect
+	cv::Mat blendReadyMat;
+	cv::bilateralFilter(iMat, blendReadyMat, 5, 150, 150);
+	cv::Mat resultMat = blendReadyMat / 25;
+	resultMat = resultMat * 25;
+
+	cv::Mat resultMatFlt;
+	resultMat.convertTo(resultMatFlt, CV_32FC3);
+
+	// blend edge and source image
+	cv::multiply(resultMatFlt, cannyMatFlt3C, resultMatFlt);
+
+	resultMatFlt.convertTo(oMat, CV_8UC3);
+}
+
