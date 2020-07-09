@@ -9,6 +9,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "02_histogram", "02_histogra
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "03_imageFilter", "03_imageFilter\03_imageFilter.vcxproj", "{BD288AF1-C6B1-4205-B9E6-E82D1539BF3E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "04_objSegmentationAndDetection", "04_objSegmentationAndDetection\04_objSegmentationAndDetection.vcxproj", "{C5EFAA91-B0E5-4794-B676-6EDE0A97921A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "05_faceTracking", "05_faceTracking\05_faceTracking.vcxproj", "{182806A8-7B36-4B15-84DF-B2107186051C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +45,22 @@ Global
 		{BD288AF1-C6B1-4205-B9E6-E82D1539BF3E}.Release|x64.Build.0 = Release|x64
 		{BD288AF1-C6B1-4205-B9E6-E82D1539BF3E}.Release|x86.ActiveCfg = Release|Win32
 		{BD288AF1-C6B1-4205-B9E6-E82D1539BF3E}.Release|x86.Build.0 = Release|Win32
+		{C5EFAA91-B0E5-4794-B676-6EDE0A97921A}.Debug|x64.ActiveCfg = Debug|x64
+		{C5EFAA91-B0E5-4794-B676-6EDE0A97921A}.Debug|x64.Build.0 = Debug|x64
+		{C5EFAA91-B0E5-4794-B676-6EDE0A97921A}.Debug|x86.ActiveCfg = Debug|Win32
+		{C5EFAA91-B0E5-4794-B676-6EDE0A97921A}.Debug|x86.Build.0 = Debug|Win32
+		{C5EFAA91-B0E5-4794-B676-6EDE0A97921A}.Release|x64.ActiveCfg = Release|x64
+		{C5EFAA91-B0E5-4794-B676-6EDE0A97921A}.Release|x64.Build.0 = Release|x64
+		{C5EFAA91-B0E5-4794-B676-6EDE0A97921A}.Release|x86.ActiveCfg = Release|Win32
+		{C5EFAA91-B0E5-4794-B676-6EDE0A97921A}.Release|x86.Build.0 = Release|Win32
+		{182806A8-7B36-4B15-84DF-B2107186051C}.Debug|x64.ActiveCfg = Debug|x64
+		{182806A8-7B36-4B15-84DF-B2107186051C}.Debug|x64.Build.0 = Debug|x64
+		{182806A8-7B36-4B15-84DF-B2107186051C}.Debug|x86.ActiveCfg = Debug|Win32
+		{182806A8-7B36-4B15-84DF-B2107186051C}.Debug|x86.Build.0 = Debug|Win32
+		{182806A8-7B36-4B15-84DF-B2107186051C}.Release|x64.ActiveCfg = Release|x64
+		{182806A8-7B36-4B15-84DF-B2107186051C}.Release|x64.Build.0 = Release|x64
+		{182806A8-7B36-4B15-84DF-B2107186051C}.Release|x86.ActiveCfg = Release|Win32
+		{182806A8-7B36-4B15-84DF-B2107186051C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,18 @@
 #include"utility.h"
 
+static bool initRandSeed = false;
 
+// helper
+cv::Scalar randomColor() {
+	if (!initRandSeed) {
+		srand(time(0));
+		initRandSeed = true;
+	}
+	return cv::Scalar(rand() % 255, rand() % 255, rand() % 255);
+}
+
+
+// histogram
 bool histogramMat(const cv::Mat& iMat, cv::Mat& oMat, int iLineWidth) {
 	// sperate source image b g r color channel
 	std::vector<cv::Mat> bgrMats;
@@ -79,10 +91,6 @@ bool histogramMat(const cv::Mat& iMat, cv::Mat& oMat, int iLineWidth) {
 	return true;
 }
 
-
-
-
-
 cv::Mat equalizeMat(const cv::Mat& iMat) {
 	// convert bgr mat to ycrcb mat
 	cv::Mat yCrCbMat;
@@ -104,7 +112,7 @@ cv::Mat equalizeMat(const cv::Mat& iMat) {
 
 
 
-
+// filter
 void cartoonFilter(cv::Mat& iMat, cv::Mat& oMat, double edgeThreshold1, double degeThreshold2, int edgeWidth) {
 	// apply median filter to remove possible noise
 	cv::Mat cannyMatReady;
@@ -152,3 +160,59 @@ void cartoonFilter(cv::Mat& iMat, cv::Mat& oMat, double edgeThreshold1, double d
 	resultMatFlt.convertTo(oMat, CV_8UC3);
 }
 
+
+
+// object segmentation (connected components algorithme & find contours algorithme)
+int connectedComponents(cv::Mat& iMat, cv::Mat& oLables) {
+	//
+	// 1. preproessing
+	//
+	// denoise 
+	cv::Mat denoiseMat;
+	cv::medianBlur(iMat, denoiseMat, 5);
+
+	// remove light / background
+	int size = MIN(denoiseMat.cols, denoiseMat.rows);
+	cv::Mat estimateLightMat;
+	cv::blur(denoiseMat, estimateLightMat, cv::Size(size / 3, size / 3));
+
+	cv::Mat noLightMat = estimateLightMat - denoiseMat;
+
+	// binarized 
+	cv::Mat noLightBinarized;
+	cv::threshold(noLightMat, noLightBinarized, 30, 255, cv::THRESH_BINARY);
+
+	//
+	// 2.segmenting
+	//
+	int segmentCount = cv::connectedComponents(noLightBinarized, oLables);
+	
+	return segmentCount;
+}
+
+int connectedComponentsWithStatus(cv::Mat& iMat, cv::Mat& oLables, cv::Mat& oStatus, cv::Mat& oCentroids) {
+	//
+	// 1. preproessing
+	//
+	// denoise 
+	cv::Mat denoiseMat;
+	cv::medianBlur(iMat, denoiseMat, 5);
+
+	// remove light / background
+	int size = MIN(denoiseMat.cols, denoiseMat.rows);
+	cv::Mat estimateLightMat;
+	cv::blur(denoiseMat, estimateLightMat, cv::Size(size / 3, size / 3));
+
+	cv::Mat noLightMat = estimateLightMat - denoiseMat;
+
+	// binarized 
+	cv::Mat noLightBinarized;
+	cv::threshold(noLightMat, noLightBinarized, 30, 255, cv::THRESH_BINARY);
+
+	//
+	// 2.segmenting
+	//
+	int segmentCount = cv::connectedComponentsWithStats(noLightBinarized, oLables, oStatus, oCentroids);
+
+	return segmentCount;
+}
