@@ -110,9 +110,62 @@ cv::Mat equalizeMat(const cv::Mat& iMat) {
 	return yCrCbMat;
 }
 
+cv::Mat edgeMorphologyTransform(cv::Mat& iMat, MorphologyTransformType type, int morphElement, int morphSize) {
+	cv::Mat output;
+	
+	// get kernel
+	cv::Mat k = cv::getStructuringElement(morphElement, cv::Size(morphSize * 2 + 1, morphSize * 2 + 1), cv::Point(morphSize, morphSize));
+	cv::Mat ex;
+	cv::Mat sh;
+
+	switch (type) 
+	{
+	case expand:
+		cv::dilate(iMat, output, k);
+		break;
+
+	case shrink:
+		cv::erode(iMat, output, k);
+		break;
+
+	case stroke:
+		// expend - shrink
+		cv::dilate(iMat, ex, k);
+		cv::erode(iMat, sh, k);
+		output = ex - sh;
+
+	case opening:
+		cv::erode(iMat, sh, k);
+		cv::dilate(sh, output, k);
+		break;
+
+	case closing:
+		cv::dilate(iMat, ex, k);
+		cv::erode(ex, output, k);
+		break;
+
+	case topHat:
+		// input - opening 
+		cv::erode(iMat, sh, k);
+		cv::dilate(sh, ex, k);
+		output = iMat - ex;
+		break;
+
+	case blackHat:
+		// closing - input
+		cv::dilate(iMat, ex, k);
+		cv::erode(ex, sh, k);
+		output = sh - iMat;
+		break;
+
+	default:
+		break;
+	}
+
+	return output;
+}
 
 
-// filter
 void cartoonFilter(cv::Mat& iMat, cv::Mat& oMat, double edgeThreshold1, double degeThreshold2, int edgeWidth) {
 	// apply median filter to remove possible noise
 	cv::Mat cannyMatReady;
@@ -124,8 +177,8 @@ void cartoonFilter(cv::Mat& iMat, cv::Mat& oMat, double edgeThreshold1, double d
 	cv::Canny(cannyMatReady, cannyMat, edgeThreshold1, degeThreshold2 );
 
 	// apply dilate filter to expand and link edge
-	cv::Mat k = cv::getStructuringElement(cv::MORPH_RECT, cv::Point(edgeWidth, edgeWidth));
-	cv::dilate(cannyMat, cannyMat, k);
+	cannyMat = edgeMorphologyTransform(cannyMat, MorphologyTransformType::closing);
+	cannyMat = edgeMorphologyTransform(cannyMat, MorphologyTransformType::expand, cv::MORPH_RECT, 3);
 
 	// scale edge to [0,1], invert edge color
 	cannyMat = 255 - cannyMat;
@@ -161,8 +214,9 @@ void cartoonFilter(cv::Mat& iMat, cv::Mat& oMat, double edgeThreshold1, double d
 }
 
 
-
+//
 // object segmentation (connected components algorithme & find contours algorithme)
+//
 int connectedComponents(cv::Mat& iMat, cv::Mat& oLables) {
 	//
 	// 1. preproessing
@@ -219,8 +273,6 @@ int connectedComponentsWithStatus(cv::Mat& iMat, cv::Mat& oLables, cv::Mat& oSta
 
 
 
-
-// video surveillance
 cv::Mat  frameDifference(const cv::Mat& prevFrame, const cv::Mat& curFrame, const cv::Mat& nextFrame, cv::Mat* df) {
 	static cv::Mat df_1;
 	static cv::Mat df_2;
