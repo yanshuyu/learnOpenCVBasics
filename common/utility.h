@@ -22,3 +22,8 @@ void cartoonFilter(cv::Mat& iMat, cv::Mat& oMat, double edgeThreshold1 = 50, dou
 int connectedComponents(cv::Mat& iMat, cv::Mat& oLables);
 
 int connectedComponentsWithStatus(cv::Mat& iMat, cv::Mat& oLables, cv::Mat& oStatus, cv::Mat& oCentroids);
+
+
+// video surveillance
+
+cv::Mat frameDifference(const cv::Mat& prevFrame, const cv::Mat& curFrame, const cv::Mat& nextFrame, cv::Mat* df = nullptr);

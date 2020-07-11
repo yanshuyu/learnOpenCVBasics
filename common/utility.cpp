@@ -216,3 +216,20 @@ int connectedComponentsWithStatus(cv::Mat& iMat, cv::Mat& oLables, cv::Mat& oSta
 
 	return segmentCount;
 }
+
+
+
+
+// video surveillance
+cv::Mat  frameDifference(const cv::Mat& prevFrame, const cv::Mat& curFrame, const cv::Mat& nextFrame, cv::Mat* df) {
+	static cv::Mat df_1;
+	static cv::Mat df_2;
+	cv::Mat output;
+	df = df ? df : &output;
+
+	cv::absdiff(curFrame, prevFrame, df_1);
+	cv::absdiff(nextFrame, curFrame, df_2);
+	cv::bitwise_and(df_1, df_2, *df);
+
+	return *df;
+}
