@@ -2,8 +2,8 @@
 #include<opencv2/opencv.hpp>
 
 // helper
+cv::Scalar randomColorNormalized();
 cv::Scalar randomColor();
-
 
 
 // 
@@ -21,6 +21,18 @@ enum MorphologyTransformType {
 
 // morphologycal operation
 cv::Mat edgeMorphologyTransform(cv::Mat& iMat, MorphologyTransformType type, int morphElement = cv::MORPH_RECT, int morphSize = 2);
+
+
+// smooth filter
+enum SmoothType {
+	mean,
+	box,
+	guassian,
+	median,
+	bilateral,
+};
+
+cv::Mat smoothFilter(cv::Mat& iMat, SmoothType type, int kernelSize, int borderType = 4, double sigmal1 = 1.0, double sigmal2 = 1.0);
 
 // object segmentation  (connected components algorithme & find contours algorithme) 
 int connectedComponents(cv::Mat& iMat, cv::Mat& oLables);

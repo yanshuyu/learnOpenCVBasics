@@ -1,15 +1,17 @@
 #include"utility.h"
 
-static bool initRandSeed = false;
 
 // helper
-cv::Scalar randomColor() {
-	if (!initRandSeed) {
-		srand(time(0));
-		initRandSeed = true;
-	}
-	return cv::Scalar(rand() % 255, rand() % 255, rand() % 255);
+cv::Scalar randomColorNormalized() {
+	cv::RNG& rng = cv::theRNG();
+	return cv::Scalar(rng.uniform(0.0, 1.0), rng.uniform(0.0, 1.0), rng.uniform(0.0, 1.0));
 }
+
+cv::Scalar  randomColor() {
+	cv::RNG& rng = cv::theRNG();
+	return cv::Scalar(rng.uniform(0.0, 256.0), rng.uniform(0.0, 256.0), rng.uniform(0.0, 256.0));
+}
+
 
 
 // histogram
@@ -165,11 +167,38 @@ cv::Mat edgeMorphologyTransform(cv::Mat& iMat, MorphologyTransformType type, int
 	return output;
 }
 
+cv::Mat smoothFilter(cv::Mat& iMat, SmoothType type, int kernelSize, int borderType, double sigmal1, double sigmal2) {
+	cv::Mat output;
+	switch (type)
+	{
+	case mean:
+		cv::blur(iMat, output, cv::Size(kernelSize, kernelSize), cv::Point(-1, -1), borderType);
+		break;
+
+	case box:
+		cv::boxFilter(iMat, output, CV_8U, cv::Size(kernelSize, kernelSize), cv::Point(-1, -1), true, borderType);
+		break;
+
+	case guassian:
+		cv::GaussianBlur(iMat, output, cv::Size(kernelSize, kernelSize), sigmal1, sigmal2, borderType);
+		break;
+
+	case median:
+		cv::medianBlur(iMat, output, kernelSize);
+		break;
+
+	case bilateral:
+		cv::bilateralFilter(iMat, output, kernelSize, sigmal1, sigmal2, borderType);
+		break;
+	default:
+		break;
+	}
+	return output;
+}
 
 void cartoonFilter(cv::Mat& iMat, cv::Mat& oMat, double edgeThreshold1, double degeThreshold2, int edgeWidth) {
 	// apply median filter to remove possible noise
-	cv::Mat cannyMatReady;
-	cv::medianBlur(iMat, cannyMatReady, 5);
+	cv::Mat cannyMatReady = smoothFilter(iMat, SmoothType::bilateral, 5);
 	//cv::imshow("noise reduction", resultMat);
 
 	// apply canny filter to look up edges
@@ -193,14 +222,13 @@ void cartoonFilter(cv::Mat& iMat, cv::Mat& oMat, double edgeThreshold1, double d
 	cv::merge(cannyMatChannels, 3, cannyMatFlt3C);
 
 	// smooth edge
-	cv::blur(cannyMatFlt3C, cannyMatFlt3C, cv::Size(5, 5));
+	cannyMatFlt3C = smoothFilter(cannyMatFlt3C, SmoothType::mean, 7);
 
 	//cv::imshow("edges", cannyMatFlt3C);
 
 	// apply  bilateral filter reduce noise and keep edge
 	// truncate color to create stonger cartoon efflect
-	cv::Mat blendReadyMat;
-	cv::bilateralFilter(iMat, blendReadyMat, 5, 150, 150);
+	cv::Mat blendReadyMat = smoothFilter(iMat, SmoothType::bilateral, 5, 4, 100, 100);
 	cv::Mat resultMat = blendReadyMat / 25;
 	resultMat = resultMat * 25;
 

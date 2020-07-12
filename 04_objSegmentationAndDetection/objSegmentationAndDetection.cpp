@@ -18,6 +18,7 @@ int main(int argc, char* argv[]) {
 		cv::Mat visualizeSegments = cv::Mat::zeros(segments.rows, segments.cols, CV_8UC3);
 		for (size_t i = 1; i < objCount; i++) {
 			cv::Mat mask = segments == i;
+			auto c = randomColorNormalized() * 255;
 			visualizeSegments.setTo(randomColor(), mask);
 
 			std::stringstream ss;
