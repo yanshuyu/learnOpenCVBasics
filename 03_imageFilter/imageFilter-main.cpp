@@ -6,7 +6,7 @@ int main(int argc, char* argv[]) {
 
 	 cv::Mat inputMat = cv::imread("flowers.jpg", cv::IMREAD_COLOR);
 	cv::imshow("Flowers.jpg", inputMat);
-
+	/*
 	cartoonFilter(inputMat, inputMat);
 	cv::imshow("cartoon effect", inputMat);
 
@@ -28,6 +28,14 @@ int main(int argc, char* argv[]) {
 
 	cv::Mat bilateralBlur = smoothFilter(image, SmoothType::bilateral, 7);
 	cv::imshow("bilateralblur", bilateralBlur);
+
+	*/
+
+	cv::Mat sobel;
+	cv::Mat gray;
+	cv::cvtColor(inputMat, gray, cv::COLOR_BGR2GRAY);
+	cv::Sobel(gray, sobel, CV_16S, 1, 1, 5);
+	cv::imshow("sobel", sobel);
 
 	cv::waitKey();
 

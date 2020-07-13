@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "05_faceTracking", "05_faceT
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "06_videoSurveillanceAndTracking", "06_videoSurveillanceAndTracking\06_videoSurveillanceAndTracking.vcxproj", "{8FE5DE08-6F61-4C76-B5D3-40C6491B40ED}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "07_facailLandmarkDetection", "07_facailLandmarkDetection\07_facailLandmarkDetection.vcxproj", "{43F20FC7-7A50-41F6-884B-003D5466870B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -71,6 +73,14 @@ Global
 		{8FE5DE08-6F61-4C76-B5D3-40C6491B40ED}.Release|x64.Build.0 = Release|x64
 		{8FE5DE08-6F61-4C76-B5D3-40C6491B40ED}.Release|x86.ActiveCfg = Release|Win32
 		{8FE5DE08-6F61-4C76-B5D3-40C6491B40ED}.Release|x86.Build.0 = Release|Win32
+		{43F20FC7-7A50-41F6-884B-003D5466870B}.Debug|x64.ActiveCfg = Debug|x64
+		{43F20FC7-7A50-41F6-884B-003D5466870B}.Debug|x64.Build.0 = Debug|x64
+		{43F20FC7-7A50-41F6-884B-003D5466870B}.Debug|x86.ActiveCfg = Debug|Win32
+		{43F20FC7-7A50-41F6-884B-003D5466870B}.Debug|x86.Build.0 = Debug|Win32
+		{43F20FC7-7A50-41F6-884B-003D5466870B}.Release|x64.ActiveCfg = Release|x64
+		{43F20FC7-7A50-41F6-884B-003D5466870B}.Release|x64.Build.0 = Release|x64
+		{43F20FC7-7A50-41F6-884B-003D5466870B}.Release|x86.ActiveCfg = Release|Win32
+		{43F20FC7-7A50-41F6-884B-003D5466870B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
