@@ -34,10 +34,6 @@ enum SmoothType {
 
 cv::Mat smoothFilter(cv::Mat& iMat, SmoothType type, int kernelSize, int borderType = 4, double sigmal1 = 1.0, double sigmal2 = 1.0);
 
-// object segmentation  (connected components algorithme & find contours algorithme) 
-int connectedComponents(cv::Mat& iMat, cv::Mat& oLables);
-
-int connectedComponentsWithStatus(cv::Mat& iMat, cv::Mat& oLables, cv::Mat& oStatus, cv::Mat& oCentroids);
 
 // histogram
 bool histogramMat(const cv::Mat& iMat, cv::Mat& oMat, int iLineWidth = 1);

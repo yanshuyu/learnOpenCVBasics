@@ -242,65 +242,6 @@ void cartoonFilter(cv::Mat& iMat, cv::Mat& oMat, double edgeThreshold1, double d
 }
 
 
-//
-// object segmentation (connected components algorithme & find contours algorithme)
-//
-int connectedComponents(cv::Mat& iMat, cv::Mat& oLables) {
-	//
-	// 1. preproessing
-	//
-	// denoise 
-	cv::Mat denoiseMat;
-	cv::medianBlur(iMat, denoiseMat, 5);
-
-	// remove light / background
-	int size = MIN(denoiseMat.cols, denoiseMat.rows);
-	cv::Mat estimateLightMat;
-	cv::blur(denoiseMat, estimateLightMat, cv::Size(size / 3, size / 3));
-
-	cv::Mat noLightMat = estimateLightMat - denoiseMat;
-
-	// binarized 
-	cv::Mat noLightBinarized;
-	cv::threshold(noLightMat, noLightBinarized, 30, 255, cv::THRESH_BINARY);
-
-	//
-	// 2.segmenting
-	//
-	int segmentCount = cv::connectedComponents(noLightBinarized, oLables);
-	
-	return segmentCount;
-}
-
-int connectedComponentsWithStatus(cv::Mat& iMat, cv::Mat& oLables, cv::Mat& oStatus, cv::Mat& oCentroids) {
-	//
-	// 1. preproessing
-	//
-	// denoise 
-	cv::Mat denoiseMat;
-	cv::medianBlur(iMat, denoiseMat, 5);
-
-	// remove light / background
-	int size = MIN(denoiseMat.cols, denoiseMat.rows);
-	cv::Mat estimateLightMat;
-	cv::blur(denoiseMat, estimateLightMat, cv::Size(size / 3, size / 3));
-
-	cv::Mat noLightMat = estimateLightMat - denoiseMat;
-
-	// binarized 
-	cv::Mat noLightBinarized;
-	cv::threshold(noLightMat, noLightBinarized, 30, 255, cv::THRESH_BINARY);
-
-	//
-	// 2.segmenting
-	//
-	int segmentCount = cv::connectedComponentsWithStats(noLightBinarized, oLables, oStatus, oCentroids);
-
-	return segmentCount;
-}
-
-
-
 cv::Mat  frameDifference(const cv::Mat& prevFrame, const cv::Mat& curFrame, const cv::Mat& nextFrame, cv::Mat* df) {
 	static cv::Mat df_1;
 	static cv::Mat df_2;
