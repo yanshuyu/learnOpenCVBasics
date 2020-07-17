@@ -1,6 +1,9 @@
 #include<opencv2/opencv.hpp>
 #include<common/utility.h>
+#include<iostream>
 
+using std::cout;
+using std::endl;
 
 
 cv::Mat getFrame(cv::VideoCapture& cap, cv::Mat* iframeStore = nullptr, cv::Mat* oframeStore = nullptr);
@@ -32,11 +35,15 @@ int main(int agrc, char* agrv[]) {
 	nextGray = getFrame(cap);
 
 
+	cv::Mat cornerMask;
+	cv::Mat cornerMaskNorm;
+	cv::namedWindow("harris corners");
+	std::vector<cv::Point2f> cornerPoints;
+
 	while (true)
 	{
 		//
 		// 1 background subtract with frame diffrences
-		cv::imshow("frameGray", frame);
 		cv::imshow("frameDiffrence", frameDifference(prevGray, curGray, nextGray, &frameDF));
 
 
@@ -45,6 +52,27 @@ int main(int agrc, char* agrv[]) {
 		pMOG2->apply(frame, fgMOG2Mask);
 		cv::imshow("fgMOG2Mask", fgMOG2Mask);
 
+		// 3 detect corners
+		/* 
+		cv::cornerHarris(curGray, cornerMask, 4, 0.08, cv::BORDER_DEFAULT);
+		cv::normalize(cornerMask, cornerMask, 0, 255, cv::NORM_MINMAX, CV_32FC1);
+		cv::convertScaleAbs(cornerMask, cornerMaskNorm);
+		cv::threshold(cornerMaskNorm, cornerMaskNorm, 200, 255, cv::THRESH_BINARY_INV);
+		cv::imshow("harris corners", cornerMaskNorm);
+		*/
+
+		// 4 feature base track
+		cornerPoints.clear();
+		cv::goodFeaturesToTrack(curGray, cornerPoints, 100, 0.04, 15, cv::noArray(), 5, false);
+		if (cornerPoints.size() > 0) {
+			for (auto& corner : cornerPoints) {
+				cv::circle(frame, corner, 8, randomColor(), 3, cv::LineTypes::FILLED);
+			}
+		}
+
+		cv::imshow("frameGray", frame);
+
+		//cout << cv::max(cornerMask, 0) << endl;
 
 		curGray.copyTo(prevGray);
 		nextGray.copyTo(curGray);
