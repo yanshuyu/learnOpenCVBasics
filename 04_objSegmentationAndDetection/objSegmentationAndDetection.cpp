@@ -2,7 +2,7 @@
 #include<common/utility.h>
 #include<iostream>
 #include<sstream>
-[]#include<vector>
+#include<vector>
 
 
 int main(int argc, char* argv[]) {
