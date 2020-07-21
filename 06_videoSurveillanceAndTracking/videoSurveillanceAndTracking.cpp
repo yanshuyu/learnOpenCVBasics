@@ -7,6 +7,7 @@ using std::endl;
 
 
 cv::Mat getFrame(cv::VideoCapture& cap, cv::Mat* iframeStore = nullptr, cv::Mat* oframeStore = nullptr);
+void glRenderCallback(void*);
 
 int main(int agrc, char* agrv[]) {
 	cv::VideoCapture cap;
@@ -16,9 +17,10 @@ int main(int agrc, char* agrv[]) {
 		return -1;
 	}
 	
-	cv::namedWindow("frameGray");
+	cv::namedWindow("capturing");
 	cv::namedWindow("frameDiffrence");
 	cv::namedWindow("fgMOG2Mask");
+	cv::namedWindow("keyPoints");
 
 	cv::Mat frame;
 	cv::Mat curGray;
@@ -29,6 +31,10 @@ int main(int agrc, char* agrv[]) {
 	cv::Ptr<cv::BackgroundSubtractor> pMOG2 = cv::createBackgroundSubtractorMOG2();
 	cv::Mat fgMOG2Mask;
 
+
+	cv::Ptr<cv::Feature2D> orbFeature2dImp = cv::ORB::create();
+	std::vector<cv::KeyPoint> keyPoints;
+	cv::Mat kpDescriptors;
 	
 	prevGray = getFrame(cap);
 	curGray = getFrame(cap, &frame);
@@ -37,13 +43,16 @@ int main(int agrc, char* agrv[]) {
 
 	cv::Mat cornerMask;
 	cv::Mat cornerMaskNorm;
-	cv::namedWindow("harris corners");
-	std::vector<cv::Point2f> cornerPoints;
+	//cv::namedWindow("harris corners");
+	//std::vector<cv::Point2f> keyPoints;
+
 
 	while (true)
 	{
+		cv::imshow("capturing", frame);
+
 		//
-		// 1 background subtract with frame diffrences
+		// 1 detection motion with frame diffrences
 		cv::imshow("frameDiffrence", frameDifference(prevGray, curGray, nextGray, &frameDF));
 
 
@@ -52,7 +61,7 @@ int main(int agrc, char* agrv[]) {
 		pMOG2->apply(frame, fgMOG2Mask);
 		cv::imshow("fgMOG2Mask", fgMOG2Mask);
 
-		// 3 detect corners
+		// 3 find feature(key) point using harris algorithme
 		/* 
 		cv::cornerHarris(curGray, cornerMask, 4, 0.08, cv::BORDER_DEFAULT);
 		cv::normalize(cornerMask, cornerMask, 0, 255, cv::NORM_MINMAX, CV_32FC1);
@@ -61,18 +70,25 @@ int main(int agrc, char* agrv[]) {
 		cv::imshow("harris corners", cornerMaskNorm);
 		*/
 
-		// 4 feature base track
-		cornerPoints.clear();
-		cv::goodFeaturesToTrack(curGray, cornerPoints, 100, 0.04, 15, cv::noArray(), 5, false);
-		if (cornerPoints.size() > 0) {
-			for (auto& corner : cornerPoints) {
-				cv::circle(frame, corner, 8, randomColor(), 3, cv::LineTypes::FILLED);
+		// 4 finding feature(key) points
+		/*
+		keyPoints.clear();
+		cv::goodFeaturesToTrack(curGray, keyPoints, 100, 0.05, 15, cv::noArray(), 5, false);
+	
+		if (keyPoints.size() > 0) {
+			for (auto& kp : keyPoints) {
+				cv::circle(frame, kp, 3, randomColor());
 			}
+			cv::imshow("keyPoints", frame);
 		}
+		*/
 
-		cv::imshow("frameGray", frame);
-
-		//cout << cv::max(cornerMask, 0) << endl;
+		// finding keypoints , computing keypoint description, visulize keypoints
+		keyPoints.clear();
+		orbFeature2dImp->detectAndCompute(frame, cv::noArray(), keyPoints, kpDescriptors);
+		cv::drawKeypoints(frame, keyPoints, frame, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+		cv::imshow("keyPoints", frame);
+	
 
 		curGray.copyTo(prevGray);
 		nextGray.copyTo(curGray);
@@ -99,4 +115,9 @@ cv::Mat getFrame(cv::VideoCapture& cap, cv::Mat* iframeStore, cv::Mat* oframeSto
 	cap >> *iframeStore;
 	cv::cvtColor(*iframeStore, *oframeStore, cv::COLOR_BGR2GRAY);
 	return *oframeStore;
+}
+
+
+void glRenderCallback(void*) {
+
 }
