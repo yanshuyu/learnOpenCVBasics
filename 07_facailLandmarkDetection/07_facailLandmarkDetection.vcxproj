@@ -143,7 +143,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\FaceDetector.cpp" />
+    <ClCompile Include="..\common\utility.cpp" />
     <ClCompile Include="facailLandmarkDetection-main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common\FaceDetector.h" />
+    <ClInclude Include="..\common\utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -13,6 +13,62 @@ cv::Scalar  randomColor() {
 }
 
 
+bool getFacemarkZoneIndexRange(FacemarkZone zone, size_t& begin, size_t& end) {
+	switch (zone)
+	{
+	case FacemarkZone::jaw:
+		begin = 0;
+		end = 17;
+		break;
+
+	case FacemarkZone::rightBrow:
+		begin = 17;
+		end = 22;
+		break;
+
+	case FacemarkZone::leftBrow:
+		begin = 22;
+		end = 27;
+		break;
+
+	case FacemarkZone::noseUpper:
+		begin = 27;
+		end = 31;
+		break;
+
+	case FacemarkZone::noseLower:
+		begin = 31;
+		end = 36;
+		break;
+
+	case FacemarkZone::rightEye:
+		begin = 36;
+		end = 42;
+		break;
+
+	case FacemarkZone::leftEye:
+		begin = 42;
+		end = 48;
+		break;
+
+	case FacemarkZone::mouseOuter:
+		begin = 48;
+		end = 60;
+		break;
+
+	case FacemarkZone::mouseInner:
+		begin = 60;
+		end = 68;
+		break;
+
+	default:
+		return false;
+	}
+
+	return true;
+}
+
+
 
 // histogram
 bool histogramMat(const cv::Mat& iMat, cv::Mat& oMat, int iLineWidth) {

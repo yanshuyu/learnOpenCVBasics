@@ -1,5 +1,7 @@
 #include<opencv2/opencv.hpp>
 #include<opencv2/face.hpp>
+#include<common/utility.h>
+#include<common/FaceDetector.h>
 #include<iostream>
 #include<vector>
 
@@ -8,57 +10,49 @@ using std::endl;
 
 
 
-void detectFaceROI(cv::CascadeClassifier& faceCascade, cv::Mat& frame, std::vector<cv::Rect>& detectedFaces); 
-bool detectFaceLandmark(cv::Ptr<cv::face::Facemark> pFacemark, cv::Mat& frame, std::vector<cv::Rect>& faceROI,std::vector<std::vector<cv::Point2f>>& detectedFaceLandmarks);
 void drawFaceROI(cv::Mat& frame, std::vector<cv::Rect>& faces);
-void drawFaceLandmark(cv::Mat& frame, cv::Ptr<cv::face::Facemark> pFacemark, std::vector<std::vector<cv::Point2f>>& faceLandmarks);
-
-
+void drawFacemarkZone(cv::Mat& frame,const std::vector<cv::Point>& zone, cv::Scalar color);
 
 int main(int argc, char* argv[]) {
 	cv::VideoCapture cap(0);
 	cv::Mat frame;
+	cv::Mat faceMask;
+	FaceDetector faceDetector;
 
 	if (!cap.isOpened()) {
 		cout << " failed to open webCam!" << endl;
 		return -1;
 	}
 
-
-	cv::CascadeClassifier faceCascade;
-	if (!faceCascade.load("haarcascade_frontalface_alt.xml")) {
-		cout << "failed to load face cascade modle!" << endl;
-		return -1;
-	}
-
-	cv::Ptr<cv::face::Facemark> pFaceMarkLBF = cv::face::FacemarkLBF::create();
-	pFaceMarkLBF->loadModel("lbfmodel.yaml");
-
 	const char* wndTitle = "facial landmark detection";
 	cv::namedWindow(wndTitle);
 
-	std::vector<cv::Rect> faceROIVec;
-	std::vector<std::vector<cv::Point2f>> faceLandMarkVec;
+	std::vector<cv::Scalar> faceZoneColors;
+	faceZoneColors.reserve((size_t)FacemarkZone::end);
+	while (faceZoneColors.size() < (size_t)FacemarkZone::end) {
+		faceZoneColors.push_back(randomColor());
+	}
 
 	while (true) {
 		cap >> frame;
-		
+
 		if (frame.empty()) 
 			continue;
-
-		detectFaceROI(faceCascade, frame, faceROIVec);
-
-		if (faceROIVec.size() > 0) {
-			if (detectFaceLandmark(pFaceMarkLBF, frame, faceROIVec, faceLandMarkVec)) {
-				drawFaceLandmark(frame, pFaceMarkLBF, faceLandMarkVec);
+	
+		if (faceDetector.detect(frame) > 0) {
+			for (size_t zone = 0; zone < (size_t)FacemarkZone::end; zone++) {
+				auto faceZones = faceDetector.getFaceMarkZone((FacemarkZone)zone);
+				for (auto& zonePoints : faceZones) {
+					cv::Point* pointsData = zonePoints.data();
+					int numPoints = zonePoints.size();
+					cv::polylines(frame, &pointsData, &numPoints, 1, false, faceZoneColors[(size_t)zone], 2);
+				}
 			}
 		}
 
-		drawFaceROI(frame, faceROIVec);
-
 		cv::imshow(wndTitle, frame);
 
-		if (cv::waitKey(1) > 0)
+		if (cv::waitKey(5) > 0)
 			break;
 	}
 
@@ -69,23 +63,6 @@ int main(int argc, char* argv[]) {
 
 
 
-
-void detectFaceROI(cv::CascadeClassifier& faceCascade, cv::Mat& frame, std::vector<cv::Rect>& detectedFaces) {
-	cv::Mat gray;
-	if (frame.channels() > 1) {
-		cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
-	} else {
-		frame.copyTo(gray);
-	}
-
-	cv::equalizeHist(gray, gray);
-
-	detectedFaces.clear();
-
-	faceCascade.detectMultiScale(gray, detectedFaces, 1.2);
-}
-
-
 void drawFaceROI(cv::Mat& frame, std::vector<cv::Rect>& faces) {
 	for (const auto& rect : faces) {
 		cv::rectangle(frame, rect, cv::Scalar(0, 255, 0));
@@ -93,21 +70,22 @@ void drawFaceROI(cv::Mat& frame, std::vector<cv::Rect>& faces) {
 }
 
 
-bool detectFaceLandmark(cv::Ptr<cv::face::Facemark> pFacemark, cv::Mat& frame, std::vector<cv::Rect>& faceROI, std::vector<std::vector<cv::Point2f>>& detectedFaceLandmarks) {
-	if (!pFacemark)
-		return false;
-	if (faceROI.size() <= 0)
-		return false;
-
-	detectedFaceLandmarks.clear();
-	 return pFacemark->fit(frame, faceROI, detectedFaceLandmarks);
-}
-
-
-void drawFaceLandmark(cv::Mat& frame, cv::Ptr<cv::face::Facemark> pFacemark, std::vector<std::vector<cv::Point2f>>& faceLandmarks) {
-	if (!pFacemark)
+void drawFacemarkZoneMask(cv::Mat& outImage, FacemarkZone zone, const std::vector<cv::Point2f>& landMarks) {
+	if (landMarks.size() != 68)
 		return;
-	for (auto& landmark : faceLandmarks) {
-		cv::face::drawFacemarks(frame, landmark, cv::Scalar(255, 0, 0));
+
+	size_t begIdx = 0;
+	size_t endIdx = 0;
+	if (getFacemarkZoneIndexRange(FacemarkZone(zone), begIdx, endIdx) && endIdx > begIdx) {
+		std::vector<cv::Point> zonePoints;
+		std::vector<cv::Point> hullPoints;
+
+		zonePoints.reserve(endIdx - begIdx);
+		for (size_t i = begIdx; i < endIdx; i++) {
+			zonePoints.push_back(landMarks[i]);
+		}
+
+		cv::convexHull(zonePoints, hullPoints);
+		cv::fillConvexPoly(outImage, hullPoints, 255);
 	}
 }

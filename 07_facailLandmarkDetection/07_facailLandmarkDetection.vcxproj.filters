@@ -18,5 +18,19 @@
     <ClCompile Include="facailLandmarkDetection-main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\utility.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\FaceDetector.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common\utility.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\FaceDetector.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

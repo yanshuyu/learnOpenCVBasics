@@ -5,6 +5,22 @@
 cv::Scalar randomColorNormalized();
 cv::Scalar randomColor();
 
+enum class FacemarkZone
+{
+	jaw,
+	rightBrow,
+	leftBrow,
+	noseUpper,
+	noseLower,
+	rightEye,
+	leftEye,
+	mouseOuter,
+	mouseInner,
+	end,
+};
+
+bool getFacemarkZoneIndexRange(FacemarkZone zone, size_t& begin, size_t& end);
+
 
 // 
 // image processing
