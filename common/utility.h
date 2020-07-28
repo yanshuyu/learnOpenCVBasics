@@ -5,6 +5,9 @@
 cv::Scalar randomColorNormalized();
 cv::Scalar randomColor();
 
+float radiusToDegree(float r);
+float degreeToRadius(float d);
+
 enum class FacemarkZone
 {
 	jaw,

@@ -13,6 +13,15 @@ cv::Scalar  randomColor() {
 }
 
 
+float radiusToDegree(float r) {
+	return r * 180 / 3.1415962;
+}
+
+float degreeToRadius(float d) {
+	return d * 3.11415962 / 180;
+}
+
+
 bool getFacemarkZoneIndexRange(FacemarkZone zone, size_t& begin, size_t& end) {
 	switch (zone)
 	{
